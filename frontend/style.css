@@ -1,0 +1,154 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 90%;
+    max-width: 650px;
+    margin: 20px auto;
+    padding: 10px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.header p {
+    color: #64748b;
+    font-size: 15px;
+}
+
+.voice-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 30px 24px;
+    text-align: center;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+}
+
+.mic-button {
+    width: 95px;
+    height: 95px;
+    border: none;
+    border-radius: 50%;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 36px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin: 15px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    outline: none;
+}
+
+.mic-button:hover {
+    background: #1e293b;
+    transform: scale(1.05);
+}
+
+.mic-button.listening {
+    background: #ef4444;
+    animation: pulse 1.3s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    70% { transform: scale(1.08); box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.status {
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    margin: 8px 0 20px;
+}
+
+.message-box {
+    text-align: left;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 16px;
+    border-radius: 14px;
+    margin-top: 14px;
+}
+
+.message-box h3 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.message-box p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #334155;
+    white-space: pre-line;
+}
+
+.buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 24px;
+    flex-wrap: wrap;
+}
+
+.control-button {
+    border: 1px solid #cbd5e1;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #ffffff;
+    font-size: 14px;
+    font-weight: 500;
+    color: #334155;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.control-button:hover {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+@media (max-width: 600px) {
+    .voice-card {
+        padding: 20px 16px;
+    }
+    .mic-button {
+        width: 85px;
+        height: 85px;
+        font-size: 32px;
+    }
+}
