@@ -2,7 +2,7 @@
 // CONFIGURATION
 // Replace with your live Render backend URL when deployed!
 // ============================================================
-const BACKEND_URL = "http://localhost:8000"; 
+const BACKEND_URL = "https://career-voice-bot.onrender.com/"; 
 // Example after deploying to Render: "https://your-app-name.onrender.com"
 
 // ============================================================
