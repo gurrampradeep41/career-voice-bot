@@ -1,20 +1,20 @@
 // ============================================================
 // CONFIGURATION
-// Replace with your live Render backend URL when deployed!
+// Keep your live backend link
 // ============================================================
-const BACKEND_URL = "https://career-voice-bot.onrender.com/"; 
-// Example after deploying to Render: "https://your-app-name.onrender.com"
+const BACKEND_URL = "https://career-voice-bot.onrender.com";
 
 // ============================================================
 // DOM ELEMENTS
 // ============================================================
 const micButton = document.getElementById("micButton");
-const statusText = document.getElementById("status");
+const statusContainer = document.getElementById("status");
+const statusLabel = document.getElementById("statusLabel");
 const userText = document.getElementById("userText");
 const aiText = document.getElementById("aiText");
 
 // ============================================================
-// STATE VARIABLES
+// STATE
 // ============================================================
 let recognition = null;
 let isListening = false;
@@ -29,7 +29,7 @@ let isStopped = false;
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
-    statusText.textContent = "Speech recognition is not supported in this browser. Please use Chrome or Edge.";
+    statusLabel.textContent = "Browser not supported. Use Chrome or Edge.";
     micButton.disabled = true;
 } else {
     recognition = new SpeechRecognition();
@@ -48,33 +48,33 @@ if (!SpeechRecognition) {
     recognition.onstart = function() {
         isListening = true;
         updateMicUI(true);
-        statusText.textContent = "Listening...";
+        setStatus("Listening...", true);
     };
 
     recognition.onend = function() {
         isListening = false;
         updateMicUI(false);
         if (!isSpeaking && !isProcessing && !isStopped) {
-            statusText.textContent = "Ready";
+            setStatus("Ready", false);
         }
     };
 
     recognition.onerror = function(event) {
-        console.error("Speech recognition error:", event.error);
+        console.error("Speech Recognition Error:", event.error);
         isListening = false;
         updateMicUI(false);
 
         if (event.error === "not-allowed") {
-            statusText.textContent = "Microphone access denied. Please enable mic permissions.";
+            setStatus("Microphone permission denied", false);
             autoListen = false;
         } else if (!isSpeaking && !isProcessing) {
-            statusText.textContent = "Ready";
+            setStatus("Ready", false);
         }
     };
 }
 
 // ============================================================
-// MIC CONTROL
+// MIC CONTROLS
 // ============================================================
 micButton.addEventListener("click", function() {
     if (isListening) {
@@ -90,8 +90,8 @@ function startVoice() {
     if (!recognition || isListening || isSpeaking || isProcessing || isStopped) return;
     try {
         recognition.start();
-    } catch (error) {
-        console.warn("Recognition start error:", error);
+    } catch (e) {
+        console.warn(e);
     }
 }
 
@@ -99,20 +99,20 @@ function stopListening() {
     if (!recognition) return;
     try {
         recognition.stop();
-    } catch (error) {
-        console.warn(error);
+    } catch (e) {
+        console.warn(e);
     }
     isListening = false;
     updateMicUI(false);
-    statusText.textContent = "Microphone paused.";
+    setStatus("Microphone paused", false);
 }
 
 // ============================================================
-// SEND MESSAGE TO BACKEND
+// BACKEND API REQUEST
 // ============================================================
 async function sendVoiceMessage(message) {
     isProcessing = true;
-    statusText.textContent = "Thinking...";
+    setStatus("Thinking...", false);
     updateMicUI(false);
 
     try {
@@ -127,7 +127,7 @@ async function sendVoiceMessage(message) {
         });
 
         if (!response.ok) {
-            throw new Error(`Server returned status: ${response.status}`);
+            throw new Error(`Server returned ${response.status}`);
         }
 
         const data = await response.json();
@@ -138,17 +138,17 @@ async function sendVoiceMessage(message) {
         speakResponse(aiResponse);
 
     } catch (error) {
-        console.error("Backend request failed:", error);
+        console.error("Backend Error:", error);
         isProcessing = false;
-        const errorMessage = "Could not connect to the AI server. Check your connection or deployment.";
+        const errorMessage = "Could not reach the AI server. If using free hosting, please allow 30 seconds for it to wake up.";
         aiText.textContent = errorMessage;
-        statusText.textContent = "Connection error.";
+        setStatus("Connection issue", false);
         speakResponse(errorMessage);
     }
 }
 
 // ============================================================
-// TEXT TO SPEECH (TTS)
+// SPEECH SYNTHESIS (TTS)
 // ============================================================
 function speakResponse(text) {
     if (!window.speechSynthesis) {
@@ -162,23 +162,21 @@ function speakResponse(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "en-IN";
     utterance.rate = 1.0;
-    utterance.pitch = 1.0;
 
     utterance.onstart = function() {
         isSpeaking = true;
-        statusText.textContent = "Speaking...";
+        setStatus("Speaking...", false);
     };
 
     utterance.onend = function() {
         isSpeaking = false;
-        statusText.textContent = "Ready";
+        setStatus("Ready", false);
         restartListening();
     };
 
-    utterance.onerror = function(err) {
-        console.error("SpeechSynthesis error:", err);
+    utterance.onerror = function() {
         isSpeaking = false;
-        statusText.textContent = "Ready";
+        setStatus("Ready", false);
         restartListening();
     };
 
@@ -193,7 +191,7 @@ function restartListening() {
 }
 
 // ============================================================
-// CONTROLS & UI
+// HELPER ACTIONS
 // ============================================================
 function stopAudio() {
     autoListen = false;
@@ -205,7 +203,7 @@ function stopAudio() {
         window.speechSynthesis.cancel();
     }
     stopListening();
-    statusText.textContent = "Stopped.";
+    setStatus("Stopped", false);
 }
 
 function restartAudio() {
@@ -216,7 +214,7 @@ function restartAudio() {
     }
     isSpeaking = false;
     isProcessing = false;
-    statusText.textContent = "Ready";
+    setStatus("Ready", false);
     setTimeout(startVoice, 400);
 }
 
@@ -228,20 +226,23 @@ function continueConversation() {
     }
 }
 
+function setStatus(text, isLive) {
+    statusLabel.textContent = text;
+    if (isLive) {
+        statusContainer.classList.add("listening");
+    } else {
+        statusContainer.classList.remove("listening");
+    }
+}
+
 function updateMicUI(listening) {
     if (listening) {
         micButton.classList.add("listening");
-        micButton.innerHTML = "🎙️";
     } else {
         micButton.classList.remove("listening");
-        micButton.innerHTML = "🎤";
     }
 }
 
 window.stopAudio = stopAudio;
 window.restartAudio = restartAudio;
 window.continueConversation = continueConversation;
-
-window.addEventListener("load", () => {
-    statusText.textContent = "Ready";
-});

@@ -1,3 +1,16 @@
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #dbeafe;
+    --background: #090d16;
+    --surface: #111827;
+    --surface-card: #1f2937;
+    --border: #374151;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --danger: #ef4444;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -5,150 +18,276 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: #f1f5f9;
-    color: #1e293b;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: var(--background);
+    color: var(--text-main);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background Ambient Lighting */
+.background-glow {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.15) 0%, rgba(9, 13, 22, 0) 70%);
+    z-index: 0;
+    pointer-events: none;
 }
 
 .container {
     width: 90%;
-    max-width: 650px;
-    margin: 20px auto;
-    padding: 10px;
+    max-width: 680px;
+    margin: 40px auto;
+    position: relative;
+    z-index: 1;
 }
 
+/* Header */
 .header {
     text-align: center;
-    margin-bottom: 25px;
+    margin-bottom: 28px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(37, 99, 235, 0.12);
+    border: 1px solid rgba(37, 99, 235, 0.3);
+    color: #60a5fa;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
 }
 
 .header h1 {
-    font-size: 28px;
+    font-size: 32px;
     font-weight: 700;
-    color: #0f172a;
+    letter-spacing: -0.5px;
+    color: #ffffff;
     margin-bottom: 6px;
 }
 
 .header p {
-    color: #64748b;
+    color: var(--text-muted);
     font-size: 15px;
 }
 
+/* Main Card */
 .voice-card {
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 30px 24px;
-    text-align: center;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.08);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 28px;
+    padding: 36px 28px;
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.mic-button {
-    width: 95px;
-    height: 95px;
-    border: none;
-    border-radius: 50%;
-    background: #0f172a;
-    color: #ffffff;
-    font-size: 36px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    margin: 15px auto;
+/* Vintage Mic Styling */
+.mic-wrapper {
+    position: relative;
+    width: 140px;
+    height: 140px;
     display: flex;
     align-items: center;
     justify-content: center;
-    outline: none;
+    margin: 10px 0 16px;
+}
+
+.mic-button {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: linear-gradient(145deg, #2a3447, #172033);
+    border: 2px solid #3b82f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+    padding: 14px;
+}
+
+.mic-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    filter: invert(1) brightness(1.2) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+    transition: transform 0.2s ease;
 }
 
 .mic-button:hover {
-    background: #1e293b;
-    transform: scale(1.05);
+    transform: scale(1.06);
+    border-color: #60a5fa;
+    box-shadow: 0 0 25px rgba(37, 99, 235, 0.4);
 }
 
 .mic-button.listening {
-    background: #ef4444;
-    animation: pulse 1.3s infinite;
+    border-color: var(--danger);
+    background: linear-gradient(145deg, #451a1a, #200e0e);
+    animation: mic-listening 1.4s infinite;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    70% { transform: scale(1.08); box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+.pulse-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    pointer-events: none;
 }
 
-.status {
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
-    margin: 8px 0 20px;
+.mic-button.listening ~ .pulse-ring {
+    border-color: rgba(239, 68, 68, 0.5);
+    animation: ring-pulse 1.8s infinite;
 }
 
-.message-box {
-    text-align: left;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 16px;
-    border-radius: 14px;
-    margin-top: 14px;
+@keyframes mic-listening {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
 }
 
-.message-box h3 {
+@keyframes ring-pulse {
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1.35); opacity: 0; }
+}
+
+/* Status Indicator */
+.status-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
     font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+.status-indicator.listening .status-dot {
+    background: var(--danger);
+    box-shadow: 0 0 8px var(--danger);
+}
+
+/* Message Panels */
+.message-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.message-card {
+    background: rgba(31, 41, 55, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    padding: 16px 20px;
+    backdrop-filter: blur(10px);
+}
+
+.card-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: #64748b;
-    margin-bottom: 6px;
+    color: #60a5fa;
+    margin-bottom: 8px;
 }
 
-.message-box p {
+.user-card .card-label {
+    color: #94a3b8;
+}
+
+.message-card p {
     font-size: 15px;
     line-height: 1.6;
-    color: #334155;
+    color: #e2e8f0;
     white-space: pre-line;
 }
 
-.buttons {
+/* Centered Control Buttons */
+.controls-wrapper {
     display: flex;
-    gap: 12px;
     justify-content: center;
-    margin-top: 24px;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    margin-top: 28px;
     flex-wrap: wrap;
 }
 
-.control-button {
-    border: 1px solid #cbd5e1;
-    padding: 10px 20px;
-    border-radius: 10px;
+.control-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 12px;
     cursor: pointer;
-    background: #ffffff;
-    font-size: 14px;
-    font-weight: 500;
-    color: #334155;
-    transition: background 0.2s, border-color 0.2s;
+    background: var(--surface-card);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    transition: all 0.2s ease;
 }
 
-.control-button:hover {
-    background: #f1f5f9;
-    border-color: #94a3b8;
+.control-btn:hover {
+    background: #374151;
+    border-color: #4b5563;
+    transform: translateY(-1px);
 }
 
+.stop-btn:hover {
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #f87171;
+}
+
+/* Footer */
 .footer {
     text-align: center;
-    margin-top: 25px;
-    color: #94a3b8;
+    margin-top: 24px;
+    color: #6b7280;
     font-size: 13px;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .voice-card {
-        padding: 20px 16px;
+        padding: 24px 16px;
+    }
+    .header h1 {
+        font-size: 26px;
     }
     .mic-button {
-        width: 85px;
-        height: 85px;
-        font-size: 32px;
+        width: 95px;
+        height: 95px;
     }
 }

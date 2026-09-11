@@ -4,44 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Techpathies AI Career Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
+<div class="background-glow"></div>
+
+<main class="container">
+    <!-- Header -->
+    <header class="header">
+        <span class="badge">AI-Powered Career Guidance</span>
         <h1>Techpathies AI</h1>
-        <p>Voice Career Assistant</p>
-    </div>
+        <p>Voice Career & Roadmap Assistant</p>
+    </header>
 
-    <div class="voice-card">
-        <button id="micButton" class="mic-button" type="button" aria-label="Microphone">
-            🎤
-        </button>
-
-        <div id="status" class="status">Ready</div>
-
-        <div class="message-box">
-            <h3>You</h3>
-            <p id="userText">Press the microphone and speak.</p>
+    <!-- Interactive Card -->
+    <section class="voice-card">
+        <!-- Vintage Microphone Button -->
+        <div class="mic-wrapper">
+            <button id="micButton" class="mic-button" type="button" aria-label="Toggle Microphone">
+                <img src="mic.png" alt="Microphone" class="mic-icon">
+            </button>
+            <div class="pulse-ring"></div>
         </div>
 
-        <div class="message-box">
-            <h3>AI Assistant</h3>
-            <p id="aiText">Hello! I am Techpathies AI Career Assistant. Ask me about career choices, skills, roadmaps, or interview preparation.</p>
+        <div id="status" class="status-indicator">
+            <span class="status-dot"></span>
+            <span id="statusLabel">Tap to speak</span>
         </div>
 
-        <div class="buttons">
-            <button class="control-button" onclick="stopAudio()">Stop</button>
-            <button class="control-button" onclick="restartAudio()">Restart</button>
-            <button class="control-button" onclick="continueConversation()">Continue</button>
-        </div>
-    </div>
+        <!-- Chat Panels -->
+        <div class="message-container">
+            <div class="message-card user-card">
+                <div class="card-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    You
+                </div>
+                <p id="userText">Press the microphone and ask your career question...</p>
+            </div>
 
-    <div class="footer">
+            <div class="message-card ai-card">
+                <div class="card-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10H12V2z"></path><path d="M12 12L2.1 12.5"></path></svg>
+                    AI Assistant
+                </div>
+                <p id="aiText">Hello! I am your Techpathies AI Career Assistant. Ask me about career choices, roadmaps, technical skills, or interview preparation.</p>
+            </div>
+        </div>
+
+        <!-- Centered Control Actions -->
+        <div class="controls-wrapper">
+            <button class="control-btn stop-btn" onclick="stopAudio()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg>
+                Stop
+            </button>
+            <button class="control-btn restart-btn" onclick="restartAudio()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+                Restart
+            </button>
+            <button class="control-btn continue-btn" onclick="continueConversation()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Continue
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
         Techpathies Skill Solutions Consultancy
-    </div>
-</div>
+    </footer>
+</main>
 
 <script src="script.js"></script>
 </body>
