@@ -20,7 +20,7 @@ if not GROQ_API_KEY:
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-MODEL_NAME = "llama-3.3-70b-versatile"
+MODEL_NAME = "openai/gpt-oss-120b"
 
 CHAT_MAX_TOKENS = 400
 DETAILED_MAX_TOKENS = 800
