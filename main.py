@@ -20,7 +20,7 @@ if not GROQ_API_KEY:
 
 groq_client = Groq(api_key=GROQ_API_KEY)
 
-MODEL_NAME = "llama-3.1-8b-instant"
+MODEL_NAME = "llama-3.3-70b-versatile"
 
 CHAT_MAX_TOKENS = 400
 DETAILED_MAX_TOKENS = 800
