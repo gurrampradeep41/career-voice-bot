@@ -1,6 +1,5 @@
 // ============================================================
 // CONFIGURATION
-// Keep your live backend link
 // ============================================================
 const BACKEND_URL = "https://career-voice-bot.onrender.com";
 
@@ -22,9 +21,36 @@ let isSpeaking = false;
 let isProcessing = false;
 let autoListen = true;
 let isStopped = false;
+let availableVoices = [];
 
 // ============================================================
-// SPEECH RECOGNITION (STT)
+// VOICE PRELOADING & AUDIO UNLOCK
+// ============================================================
+function loadSystemVoices() {
+    if ("speechSynthesis" in window) {
+        availableVoices = window.speechSynthesis.getVoices();
+    }
+}
+
+// Pre-populate system voices as soon as the browser exposes them
+loadSystemVoices();
+if ("speechSynthesis" in window && window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = loadSystemVoices;
+}
+
+// Mobile Audio Context Unlock: 
+// Browsers require a user interaction to prime speech synthesis
+function unlockBrowserAudio() {
+    if ("speechSynthesis" in window) {
+        window.speechSynthesis.resume();
+        const silentUtterance = new SpeechSynthesisUtterance("");
+        silentUtterance.volume = 0;
+        window.speechSynthesis.speak(silentUtterance);
+    }
+}
+
+// ============================================================
+// SPEECH RECOGNITION (STT) SETUP
 // ============================================================
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -60,7 +86,7 @@ if (!SpeechRecognition) {
     };
 
     recognition.onerror = function(event) {
-        console.error("Speech Recognition Error:", event.error);
+        console.warn("Speech Recognition notice:", event.error);
         isListening = false;
         updateMicUI(false);
 
@@ -74,9 +100,11 @@ if (!SpeechRecognition) {
 }
 
 // ============================================================
-// MIC CONTROLS
+// MICROPHONE TRIGGER
 // ============================================================
 micButton.addEventListener("click", function() {
+    unlockBrowserAudio(); // Primes the audio engine on user click
+
     if (isListening) {
         stopListening();
         return;
@@ -99,16 +127,14 @@ function stopListening() {
     if (!recognition) return;
     try {
         recognition.stop();
-    } catch (e) {
-        console.warn(e);
-    }
+    } catch (e) {}
     isListening = false;
     updateMicUI(false);
     setStatus("Microphone paused", false);
 }
 
 // ============================================================
-// BACKEND API REQUEST
+// BACKEND COMMUNICATION
 // ============================================================
 async function sendVoiceMessage(message) {
     isProcessing = true;
@@ -127,11 +153,11 @@ async function sendVoiceMessage(message) {
         });
 
         if (!response.ok) {
-            throw new Error(`Server returned ${response.status}`);
+            throw new Error(`Server returned status ${response.status}`);
         }
 
         const data = await response.json();
-        const aiResponse = data.reply || data.response || "Sorry, I could not generate a response.";
+        const aiResponse = data.reply || data.response || "Sorry, I could not generate an answer.";
 
         aiText.textContent = aiResponse;
         isProcessing = false;
@@ -140,28 +166,51 @@ async function sendVoiceMessage(message) {
     } catch (error) {
         console.error("Backend Error:", error);
         isProcessing = false;
-        const errorMessage = "Could not reach the AI server. If using free hosting, please allow 30 seconds for it to wake up.";
+        const errorMessage = "Server is waking up. Please allow 30 seconds and try speaking again.";
         aiText.textContent = errorMessage;
-        setStatus("Connection issue", false);
+        setStatus("Ready", false);
         speakResponse(errorMessage);
     }
 }
 
 // ============================================================
-// SPEECH SYNTHESIS (TTS)
+// SPEECH SYNTHESIS (TTS) - CROSS-DEVICE ENGINE
 // ============================================================
 function speakResponse(text) {
-    if (!window.speechSynthesis) {
+    if (!("speechSynthesis" in window)) {
         isSpeaking = false;
         restartListening();
         return;
     }
 
+    // Cancel pending utterances and resume engine if suspended
     window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN";
+
+    // Refresh voices if list was unpopulated earlier
+    if (availableVoices.length === 0) {
+        availableVoices = window.speechSynthesis.getVoices();
+    }
+
+    // Find the best matching English voice on the user's specific platform
+    const selectedVoice = availableVoices.find(v => v.lang === "en-IN") ||
+                          availableVoices.find(v => v.lang === "en-US") ||
+                          availableVoices.find(v => v.lang === "en-GB") ||
+                          availableVoices.find(v => v.lang.toLowerCase().includes("en")) ||
+                          null;
+
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        utterance.lang = selectedVoice.lang;
+    } else {
+        utterance.lang = "en-US";
+    }
+
     utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
 
     utterance.onstart = function() {
         isSpeaking = true;
@@ -174,7 +223,8 @@ function speakResponse(text) {
         restartListening();
     };
 
-    utterance.onerror = function() {
+    utterance.onerror = function(event) {
+        console.error("Audio Playback Error:", event);
         isSpeaking = false;
         setStatus("Ready", false);
         restartListening();
@@ -191,7 +241,7 @@ function restartListening() {
 }
 
 // ============================================================
-// HELPER ACTIONS
+// CONTROL ACTIONS
 // ============================================================
 function stopAudio() {
     autoListen = false;
@@ -199,7 +249,7 @@ function stopAudio() {
     isSpeaking = false;
     isProcessing = false;
 
-    if (window.speechSynthesis) {
+    if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
     }
     stopListening();
@@ -209,7 +259,8 @@ function stopAudio() {
 function restartAudio() {
     autoListen = true;
     isStopped = false;
-    if (window.speechSynthesis) {
+
+    if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
     }
     isSpeaking = false;
@@ -226,6 +277,9 @@ function continueConversation() {
     }
 }
 
+// ============================================================
+// UI HELPERS
+// ============================================================
 function setStatus(text, isLive) {
     statusLabel.textContent = text;
     if (isLive) {
